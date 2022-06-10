@@ -9,6 +9,7 @@ fun Application.configureRouting() {
 
     routing {
 
+        rootDirectory()
         getUser()
         getTripHistories()
         getRecentLocations()
