@@ -1,11 +1,9 @@
 package com.devtamuno
 
-import com.devtamuno.data.DummyData
-import com.devtamuno.data.RecentLocationResponse
-import com.devtamuno.data.UserResponse
-import com.devtamuno.data.WalletResponse
+import com.devtamuno.data.*
 import com.devtamuno.plugins.configureRouting
 import com.google.common.truth.Truth.assertThat
+import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
@@ -17,6 +15,7 @@ import kotlinx.serialization.json.decodeFromStream
 import kotlin.test.Test
 
 
+@OptIn(ExperimentalSerializationApi::class)
 class ApplicationTest {
 
 
@@ -49,7 +48,6 @@ class ApplicationTest {
 
 
     @Test
-    @OptIn(ExperimentalSerializationApi::class)
     fun `test getUser route expecting user data to match`() = testApplication {
         application {
             configureRouting()
@@ -57,7 +55,7 @@ class ApplicationTest {
 
         client.get("/get-user").apply {
 
-            val user: UserResponse = json.decodeFromStream(bodyAsChannel().toInputStream())
+            val user: UserResponse = json.decodeFromStream(body())
 
             assertThat(HttpStatusCode.OK).isEqualTo(status)
             assertThat(user.user).isEqualTo(DummyData.DummyUser)
@@ -75,7 +73,6 @@ class ApplicationTest {
 
 
     @Test
-    @OptIn(ExperimentalSerializationApi::class)
     fun `test getRecentLocations route expecting list of recent locations`() = testApplication {
         application {
             configureRouting()
@@ -83,7 +80,7 @@ class ApplicationTest {
 
         client.get("/recent-locations").apply {
 
-            val data: RecentLocationResponse = json.decodeFromStream(bodyAsChannel().toInputStream())
+            val data: RecentLocationResponse = json.decodeFromStream(body())
 
             assertThat(HttpStatusCode.OK).isEqualTo(status)
             assertThat(data.list).isNotEmpty()
@@ -104,7 +101,7 @@ class ApplicationTest {
     }
 
 
-    @OptIn(ExperimentalSerializationApi::class)
+
     @Test
     fun `test wallet route returns data`() = testApplication {
         application {
@@ -112,9 +109,41 @@ class ApplicationTest {
         }
 
         client.get("/user-wallet").apply {
-            val data: WalletResponse = json.decodeFromStream(bodyAsChannel().toInputStream())
+            val data: WalletResponse = json.decodeFromStream(body())
             assertThat(HttpStatusCode.OK).isEqualTo(status)
-            assertThat(data.wallet).isEqualTo(DummyData.DummyWallet)
+            assertThat(data.wallet.balance).isEqualTo(DummyData.DummyWallet.balance)
+            assertThat(data.wallet.currency).isEqualTo(DummyData.DummyWallet.currency)
+        }
+    }
+
+
+    @Test
+    fun `test getTripHistories route, expecting OK status`() = testApplication {
+
+        application {
+            configureRouting()
+        }
+
+        client.get("/trip-histories").apply {
+            assertThat(HttpStatusCode.OK).isEqualTo(status)
+        }
+    }
+
+
+    @Test
+    fun `test getTripHistories route, returns data list`() = testApplication {
+
+        application {
+            configureRouting()
+        }
+
+        client.get("/trip-histories").apply {
+
+            val data: TripHistoryResponse = json.decodeFromStream(body())
+
+            assertThat(HttpStatusCode.OK).isEqualTo(status)
+            assertThat(data.list).isNotEmpty()
+            assertThat(DummyData.DummyTripHistories.size).isEqualTo(data.list.size)
         }
     }
 }
