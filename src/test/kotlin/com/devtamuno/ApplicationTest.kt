@@ -8,7 +8,6 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.server.testing.*
-import io.ktor.utils.io.jvm.javaio.*
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
@@ -89,6 +88,72 @@ class ApplicationTest {
     }
 
     @Test
+    fun `test getRecentLocation route with missing query id parameter, returns error `() = testApplication {
+        application {
+            configureRouting()
+        }
+
+        client.get("/recent-locations?id=").apply {
+
+            val error: ErrorResponse = json.decodeFromStream(body())
+
+            assertThat(HttpStatusCode.BadRequest).isEqualTo(status)
+            assertThat(error.error).isEqualTo("id must be an integer")
+        }
+
+    }
+
+    @Test
+    fun `test getRecentLocation route with wrong query data type, returns error`() = testApplication {
+        application {
+            configureRouting()
+        }
+
+        client.get("/recent-locations?id=abc").apply {
+
+            val error: ErrorResponse = json.decodeFromStream(body())
+
+            assertThat(HttpStatusCode.BadRequest).isEqualTo(status)
+            assertThat(error.error).isEqualTo("id must be an integer")
+        }
+    }
+
+
+    @Test
+    fun `test getRecentLocation route with id not found in resource, returns error`() = testApplication {
+        application {
+            configureRouting()
+        }
+
+        val id = 1000
+
+        client.get("/recent-locations?id=$id").apply {
+
+            val error: ErrorResponse = json.decodeFromStream(body())
+
+            assertThat(HttpStatusCode.BadRequest).isEqualTo(status)
+            assertThat(error.error).isEqualTo("No recent location with id $id")
+        }
+
+    }
+    @Test
+    fun `test getRecentLocation with right query parameter, returns success`() = testApplication {
+        application {
+            configureRouting()
+        }
+
+        val id = 1
+
+        client.get("/recent-locations?id=$id").apply {
+
+            val data: QueryRecentLocation = json.decodeFromStream(body())
+
+            assertThat(HttpStatusCode.OK).isEqualTo(status)
+            assertThat(data.location).isIn(DummyData.DummyRecentLocations)
+        }
+    }
+
+    @Test
     fun `test wallet route, expecting OK status`() = testApplication {
 
         application {
@@ -99,7 +164,6 @@ class ApplicationTest {
             assertThat(HttpStatusCode.OK).isEqualTo(status)
         }
     }
-
 
 
     @Test
