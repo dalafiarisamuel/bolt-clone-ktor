@@ -16,7 +16,7 @@ import kotlinx.serialization.json.decodeFromStream
 import org.junit.Test
 
 @OptIn(ExperimentalSerializationApi::class)
-class RecentLocationRoutesTest {
+class RecentLocationRouteTest {
 
 
     private val json = Json {
