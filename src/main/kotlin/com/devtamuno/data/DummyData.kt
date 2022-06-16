@@ -275,7 +275,7 @@ object DummyData {
             address = "Beloit, Wisconsin(WI), 53511",
             label = "Wisconsin"
         )
-    ).sortedBy { it.id }
+    )
 
 
     val DummyAtmCards: List<DebitCard> = listOf(
