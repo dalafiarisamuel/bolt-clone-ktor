@@ -9,7 +9,7 @@ import io.ktor.server.testing.*
 import kotlin.test.Test
 
 
-class ApplicationTest {
+class ApplicationKtTest {
 
     @Test
     fun testRoot() = testApplication {

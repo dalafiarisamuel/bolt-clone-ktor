@@ -1,7 +1,7 @@
 package com.devtamuno.routes
 
 import com.devtamuno.data.DummyData
-import com.devtamuno.data.TripHistoryResponse
+import com.devtamuno.data.UserResponse
 import com.devtamuno.plugins.configureRouting
 import com.google.common.truth.Truth
 import io.ktor.client.call.*
@@ -13,8 +13,10 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
 import org.junit.Test
 
+
 @OptIn(ExperimentalSerializationApi::class)
-class TripHistoryRouteTest {
+class UserRouteKtTest {
+
 
     private val json = Json {
         ignoreUnknownKeys = true
@@ -22,32 +24,29 @@ class TripHistoryRouteTest {
 
 
     @Test
-    fun `test getTripHistories route, expecting OK status`() = testApplication {
-
+    fun `test getUser route expecting OK status`() = testApplication {
         application {
             configureRouting()
         }
+        client.get("/get-user").apply {
 
-        client.get("/trip-histories").apply {
             Truth.assertThat(HttpStatusCode.OK).isEqualTo(status)
         }
     }
 
 
     @Test
-    fun `test getTripHistories route, returns data list`() = testApplication {
-
+    fun `test getUser route expecting user data to match`() = testApplication {
         application {
             configureRouting()
         }
 
-        client.get("/trip-histories").apply {
+        client.get("/get-user").apply {
 
-            val data: TripHistoryResponse = json.decodeFromStream(body())
+            val user: UserResponse = json.decodeFromStream(body())
 
             Truth.assertThat(HttpStatusCode.OK).isEqualTo(status)
-            Truth.assertThat(data.list).isNotEmpty()
-            Truth.assertThat(DummyData.DummyTripHistories.size).isEqualTo(data.list.size)
+            Truth.assertThat(user.user).isEqualTo(DummyData.DummyUser)
         }
     }
 }

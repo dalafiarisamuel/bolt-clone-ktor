@@ -16,7 +16,7 @@ import org.junit.Test
 
 
 @OptIn(ExperimentalSerializationApi::class)
-class WalletRouteTest {
+internal class WalletRouteKtTest {
 
     private val json = Json {
         ignoreUnknownKeys = true
