@@ -1,4 +1,6 @@
 package com.devtamuno.data
 
-@kotlinx.serialization.Serializable
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class LinkedCardResponse(val list: List<DebitCard>)
