@@ -1,6 +1,7 @@
 package com.devtamuno.routes
 
 import com.devtamuno.data.DummyData
+import com.devtamuno.response.Response
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.response.*
@@ -11,8 +12,12 @@ fun Route.getTripHistories() {
     get("/trip-histories") {
         call.respond(
             HttpStatusCode.OK,
-            mapOf("list" to DummyData.DummyTripHistories)
+            Response(
+                success = true,
+                statusCode = HttpStatusCode.OK.value,
+                message = "data returned successfully",
+                data = DummyData.DummyTripHistories
+            )
         )
-
     }
 }

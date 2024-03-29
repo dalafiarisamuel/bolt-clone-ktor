@@ -1,7 +1,8 @@
 package com.devtamuno.routes
 
 import com.devtamuno.data.DummyData
-import com.devtamuno.data.UserResponse
+import com.devtamuno.response.Response
+import com.devtamuno.data.User
 import com.devtamuno.plugins.configureRouting
 import com.google.common.truth.Truth
 import io.ktor.client.call.*
@@ -43,10 +44,10 @@ class UserRouteKtTest {
 
         client.get("/get-user").apply {
 
-            val user: UserResponse = json.decodeFromStream(body())
+            val response: Response<User> = json.decodeFromStream(body())
 
             Truth.assertThat(HttpStatusCode.OK).isEqualTo(status)
-            Truth.assertThat(user.user).isEqualTo(DummyData.DummyUser)
+            Truth.assertThat(response.data).isEqualTo(DummyData.DummyUser)
         }
     }
 }

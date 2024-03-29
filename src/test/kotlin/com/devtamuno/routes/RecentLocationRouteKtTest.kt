@@ -1,10 +1,10 @@
 package com.devtamuno.routes
 
 import com.devtamuno.data.DummyData
-import com.devtamuno.data.ErrorResponse
-import com.devtamuno.data.QueryRecentLocation
-import com.devtamuno.data.RecentLocationResponse
+import com.devtamuno.data.RecentLocation
+import com.devtamuno.response.Response
 import com.devtamuno.plugins.configureRouting
+import com.devtamuno.response.ErrorResponse
 import com.google.common.truth.Truth
 import io.ktor.client.call.*
 import io.ktor.client.request.*
@@ -41,11 +41,11 @@ internal class RecentLocationRouteKtTest {
 
         client.get("/recent-locations").apply {
 
-            val data: RecentLocationResponse = json.decodeFromStream(body())
+            val response: Response<List<RecentLocation>> = json.decodeFromStream(body())
 
             Truth.assertThat(HttpStatusCode.OK).isEqualTo(status)
-            Truth.assertThat(data.list).isNotEmpty()
-            Truth.assertThat(data.list.size).isEqualTo(DummyData.DummyRecentLocations.size)
+            Truth.assertThat(response.data).isNotEmpty()
+            Truth.assertThat(response.data?.size).isEqualTo(DummyData.DummyRecentLocations.size)
         }
     }
 
@@ -55,12 +55,12 @@ internal class RecentLocationRouteKtTest {
             configureRouting()
         }
 
-        client.get("/recent-locations?id=").apply {
+        client.get("/recent-location?id=").apply {
 
             val error: ErrorResponse = json.decodeFromStream(body())
 
             Truth.assertThat(HttpStatusCode.BadRequest).isEqualTo(status)
-            Truth.assertThat(error.error).isEqualTo("id must be an integer")
+            Truth.assertThat(error.message).isEqualTo("id must be an integer")
         }
 
     }
@@ -71,12 +71,12 @@ internal class RecentLocationRouteKtTest {
             configureRouting()
         }
 
-        client.get("/recent-locations?id=abc").apply {
+        client.get("/recent-location?id=abc").apply {
 
-            val error: ErrorResponse = json.decodeFromStream(body())
+            val response: ErrorResponse = json.decodeFromStream(body())
 
             Truth.assertThat(HttpStatusCode.BadRequest).isEqualTo(status)
-            Truth.assertThat(error.error).isEqualTo("id must be an integer")
+            Truth.assertThat(response.message).isEqualTo("id must be an integer")
         }
     }
 
@@ -89,12 +89,12 @@ internal class RecentLocationRouteKtTest {
 
         val id = 1000
 
-        client.get("/recent-locations?id=$id").apply {
+        client.get("/recent-location?id=$id").apply {
 
-            val error: ErrorResponse = json.decodeFromStream(body())
+            val response: ErrorResponse = json.decodeFromStream(body())
 
-            Truth.assertThat(HttpStatusCode.BadRequest).isEqualTo(status)
-            Truth.assertThat(error.error).isEqualTo("No recent location with id $id")
+            Truth.assertThat(HttpStatusCode.NotFound).isEqualTo(status)
+            Truth.assertThat(response.message).isEqualTo("No recent location with id $id")
         }
 
     }
@@ -105,14 +105,12 @@ internal class RecentLocationRouteKtTest {
             configureRouting()
         }
 
-        val id = 1
+        client.get("/recent-location?id=1").apply {
 
-        client.get("/recent-locations?id=$id").apply {
-
-            val data: QueryRecentLocation = json.decodeFromStream(body())
+            val response: Response<RecentLocation> = json.decodeFromStream(body())
 
             Truth.assertThat(HttpStatusCode.OK).isEqualTo(status)
-            Truth.assertThat(data.location).isIn(DummyData.DummyRecentLocations)
+            Truth.assertThat(response.data).isIn(DummyData.DummyRecentLocations)
         }
     }
 

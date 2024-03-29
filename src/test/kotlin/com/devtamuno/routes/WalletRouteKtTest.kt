@@ -1,8 +1,9 @@
 package com.devtamuno.routes
 
+import com.devtamuno.data.DebitCard
 import com.devtamuno.data.DummyData
-import com.devtamuno.data.LinkedCardResponse
-import com.devtamuno.data.WalletResponse
+import com.devtamuno.response.Response
+import com.devtamuno.data.Wallet
 import com.devtamuno.plugins.configureRouting
 import com.google.common.truth.Truth
 import io.ktor.client.call.*
@@ -42,10 +43,10 @@ internal class WalletRouteKtTest {
         }
 
         client.get("/user-wallet").apply {
-            val data: WalletResponse = json.decodeFromStream(body())
+            val response: Response<Wallet> = json.decodeFromStream(body())
             Truth.assertThat(HttpStatusCode.OK).isEqualTo(status)
-            Truth.assertThat(data.wallet.balance).isEqualTo(DummyData.DummyWallet.balance)
-            Truth.assertThat(data.wallet.currency).isEqualTo(DummyData.DummyWallet.currency)
+            Truth.assertThat(response.data).isEqualTo(DummyData.DummyWallet.balance)
+            Truth.assertThat(response.data?.currency).isEqualTo(DummyData.DummyWallet.currency)
         }
     }
 
@@ -69,12 +70,11 @@ internal class WalletRouteKtTest {
         }
 
         client.get("/user-linked-cards").apply {
-
-            val cardList: LinkedCardResponse = json.decodeFromStream(body())
+            val response: Response<List<DebitCard>> = json.decodeFromStream(body())
 
             Truth.assertThat(HttpStatusCode.OK).isEqualTo(status)
-            Truth.assertThat(cardList.list).isNotEmpty()
-            Truth.assertThat(cardList.list.size).isEqualTo(DummyData.DummyAtmCards.size)
+            Truth.assertThat(response.data).isNotEmpty()
+            Truth.assertThat(response.data?.size).isEqualTo(DummyData.DummyAtmCards.size)
         }
     }
 }

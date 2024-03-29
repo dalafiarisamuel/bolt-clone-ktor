@@ -13,6 +13,7 @@ fun Application.configureRouting() {
         getUser()
         getTripHistories()
         getRecentLocations()
+        getRecentLocation()
         getWalletBalance()
         getLinkedDebitCards()
 

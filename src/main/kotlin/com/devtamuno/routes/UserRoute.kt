@@ -1,6 +1,7 @@
 package com.devtamuno.routes
 
 import com.devtamuno.data.DummyData
+import com.devtamuno.response.Response
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.response.*
@@ -10,7 +11,12 @@ fun Route.getUser() {
     get("/get-user") {
         call.respond(
             HttpStatusCode.OK,
-            mapOf("user" to DummyData.DummyUser)
+            Response(
+                success = true,
+                statusCode = HttpStatusCode.OK.value,
+                message = "data returned successfully",
+                data = DummyData.DummyUser
+            )
         )
     }
 }

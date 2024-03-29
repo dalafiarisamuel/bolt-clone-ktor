@@ -1,7 +1,8 @@
 package com.devtamuno.routes
 
 import com.devtamuno.data.DummyData
-import com.devtamuno.data.TripHistoryResponse
+import com.devtamuno.response.Response
+import com.devtamuno.data.TripHistory
 import com.devtamuno.plugins.configureRouting
 import com.google.common.truth.Truth
 import io.ktor.client.call.*
@@ -43,11 +44,11 @@ internal class TripHistoryRouteKtTest {
 
         client.get("/trip-histories").apply {
 
-            val data: TripHistoryResponse = json.decodeFromStream(body())
+            val data: Response<List<TripHistory>> = json.decodeFromStream(body())
 
             Truth.assertThat(HttpStatusCode.OK).isEqualTo(status)
-            Truth.assertThat(data.list).isNotEmpty()
-            Truth.assertThat(DummyData.DummyTripHistories.size).isEqualTo(data.list.size)
+            Truth.assertThat(data.data).isNotEmpty()
+            Truth.assertThat(DummyData.DummyTripHistories.size).isEqualTo(data.data?.size)
         }
     }
 }
